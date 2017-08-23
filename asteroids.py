@@ -5,7 +5,7 @@ import time
 import math
 # <--
 
-# makes it so each asteroid is its own object -->
+# makes it so each asteroid is its own object  -->
 class Asteroid:
     def __init__(self, x, y, radius, xspeed, yspeed, color, child):
         self.x = x
