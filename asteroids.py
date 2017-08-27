@@ -110,6 +110,8 @@ def touching(x1, y1, x2, y2, r1, r2):
     return False
 
 def checkLives(lives):
+
+    # initializes global variables that will need to be manipulated -->
     global asteroids
     global brokenPieces
     global bullets
@@ -117,6 +119,7 @@ def checkLives(lives):
     global playerY
     global xPortion
     global yPortion
+    # <--
 
     if lives < 1:
         exitGame()
