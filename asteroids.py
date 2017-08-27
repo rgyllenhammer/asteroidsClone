@@ -63,6 +63,13 @@ class Bullet:
 # <--
 
 # general functions -->
+
+def addText(text, x, y, fontSize, color):
+    myfont = pygame.font.SysFont('phosphate', fontSize) #phosphate
+
+    textsurface = myfont.render(text, True, color)
+    gameDisplay.blit(textsurface, (x, y))
+
 def wrapEdges(x, y, wrapRadius):
 
     # function that will make it so any x and y value
@@ -102,18 +109,41 @@ def touching(x1, y1, x2, y2, r1, r2):
 
     return False
 
+def checkLives(lives):
+    global asteroids
+    global brokenPieces
+    global bullets
+    global playerX
+    global playerY
+    global xPortion
+    global yPortion
+
+    if lives < 1:
+        exitGame()
+
+    else:
+        asteroids = []
+        brokenPieces = []
+        bullets = []
+
+        playerX = displayWidth / 2
+        playerY = displayHeight / 2
+
+        xPortion = 0
+        yPortion = 0
+
+        lives -= 1
+        return lives
+
 def exitGame():
-
-    # creates an easy call funcion that
-    # exits both pygame and python
-
     pygame.quit()
     quit()
-
 # <--
 
 # initializing asteroids window -->
 pygame.init()
+pygame.font.init()
+
 displayWidth = 600
 displayHeight = 400
 gameDisplay = pygame.display.set_mode((displayWidth, displayHeight))
@@ -156,6 +186,8 @@ friction = 0
 speedMag = 0
 friction = 0
 starter = False # this will give the player an initial velocity
+score = 0
+lives = 3
 
 def drawPlayer(x, y, angle):
     circle(x, y, playerRadius, white)
@@ -245,6 +277,8 @@ while alive:
                 friction = 0.01
 
     gameDisplay.fill(black)
+    addText('score: ' + str(score) , 0, 0, 30, white) # draws the score to the screen
+    addText('lives: ' + str(lives) , displayWidth - 100, 0, 30, white)
 
     # handles the movement of the ship and its slowing down -->
     direction += degreeMove
@@ -276,7 +310,7 @@ while alive:
         ast.draw()
 
         if touching(ast.x, ast.y, playerX, playerY, ast.radius, playerRadius) and ast.initialized:
-            exitGame()
+            lives = checkLives(lives)
     # <--
 
     # draws each bullet in the bullets array and checks if they need to be removed -->
@@ -292,6 +326,8 @@ while alive:
         for ast in asteroids:
             if touching(ast.x, ast.y, bul.x, bul.y, ast.radius, bul.radius) and ast.initialized:
 
+                score += 50
+
                 childRight = Asteroid(ast.x, ast.y, ast.radius / 2, ast.xspeed * random.uniform(0.1, 2), ast.yspeed * random.uniform(0.1, 2), blue, True)
                 childLeft = Asteroid(ast.x, ast.y,  ast.radius / 2, -ast.xspeed * random.uniform(0.1, 2), ast.yspeed * random.uniform(0.1, 2), blue, True)
 
@@ -300,6 +336,8 @@ while alive:
 
                 bullets.remove(bul)
                 asteroids.remove(ast)
+
+
     # <--
 
     # draws each broken piece of the asteroid as a new asteroid object -->
@@ -310,10 +348,12 @@ while alive:
         piece.draw()
 
         if touching(piece.x, piece.y, playerX, playerY, piece.radius, playerRadius) and piece.initialized:
-            exitGame()
+            lives = checkLives(lives)
 
         for bul in bullets:
             if touching(piece.x, piece.y, bul.x, bul.y, piece.radius, bul.radius):
+
+                score += 100
 
                 bullets.remove(bul)
                 brokenPieces.remove(piece)
